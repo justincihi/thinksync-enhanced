@@ -206,6 +206,10 @@ Client shows significant progress in identifying anxiety triggers and implementi
 def index():
     return send_from_directory('static', 'index.html')
 
+@app.route('/mobile')
+def mobile_upload():
+    return send_from_directory('static', 'mobile-upload.html')
+
 @app.route('/admin')
 def admin():
     return send_from_directory('static', 'index.html')
@@ -253,24 +257,62 @@ def neural_simulation():
 @app.route('/api/therapy/sessions', methods=['POST'])
 def create_session():
     try:
-        data = request.get_json() or {}
-        client_name = data.get('clientName', 'Test Client')
-        therapy_type = data.get('therapyType', 'CBT')
-        summary_format = data.get('summaryFormat', 'SOAP')
+        # Handle both JSON and multipart form data
+        if request.content_type and 'multipart/form-data' in request.content_type:
+            # Handle file upload
+            client_name = request.form.get('client_name', request.form.get('clientName', 'Test Client'))
+            therapy_type = request.form.get('therapy_type', request.form.get('therapyType', 'CBT'))
+            summary_format = request.form.get('summary_format', request.form.get('summaryFormat', 'SOAP'))
+            
+            # Handle uploaded file
+            uploaded_file = request.files.get('audio_file')
+            if uploaded_file and uploaded_file.filename:
+                # Validate file type
+                allowed_extensions = {'.mp3', '.wav', '.m4a', '.mp4', '.webm', '.ogg'}
+                file_ext = os.path.splitext(uploaded_file.filename)[1].lower()
+                
+                if file_ext not in allowed_extensions:
+                    return jsonify({'error': f'Unsupported file type: {file_ext}. Supported: {", ".join(allowed_extensions)}'}), 400
+                
+                # Validate file size (already handled by Flask MAX_CONTENT_LENGTH)
+                file_info = {
+                    'original_name': uploaded_file.filename,
+                    'size': len(uploaded_file.read()),
+                    'type': uploaded_file.content_type
+                }
+                uploaded_file.seek(0)  # Reset file pointer
+                
+                logger.info(f"File upload received: {file_info['original_name']} ({file_info['size']} bytes)")
+                
+                # For demo purposes, we'll process the file info but not actually transcribe
+                # In production, you would use OpenAI Whisper or similar service here
+                transcript_note = f"Audio file '{file_info['original_name']}' ({file_info['size']} bytes) received and would be processed by Whisper API in production."
+            else:
+                transcript_note = "No audio file provided - using simulated session data."
+        else:
+            # Handle JSON data (for demo/simulation)
+            data = request.get_json() or {}
+            client_name = data.get('clientName', 'Test Client')
+            therapy_type = data.get('therapyType', 'CBT')
+            summary_format = data.get('summaryFormat', 'SOAP')
+            transcript_note = "Simulated session data used for demonstration."
         
         # Generate analysis
         result = generate_comprehensive_analysis(client_name, therapy_type, summary_format)
         
-        # Store in database (simplified for demo)
+        # Add transcript note to analysis
+        result['transcript'] = transcript_note
+        
+        # Store in database
         session_id = f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         
         with get_db() as conn:
             cursor = conn.cursor()
             cursor.execute('''
                 INSERT INTO therapy_sessions 
-                (session_id, user_id, client_name, therapy_type, summary_format, analysis, sentiment_analysis, validation_analysis, confidence_score, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (session_id, 1, client_name, therapy_type, summary_format, 
+                (session_id, user_id, client_name, therapy_type, summary_format, transcript, analysis, sentiment_analysis, validation_analysis, confidence_score, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (session_id, 1, client_name, therapy_type, summary_format, transcript_note,
                   result['analysis'], json.dumps(result['sentimentAnalysis']), 
                   result['validationAnalysis'], result['confidenceScore'], 'completed'))
             conn.commit()
@@ -284,7 +326,7 @@ def create_session():
         
     except Exception as e:
         logger.error(f"Session creation error: {e}")
-        return jsonify({'error': 'Session processing failed'}), 500
+        return jsonify({'error': f'Session processing failed: {str(e)}'}), 500
 
 @app.route('/api/therapy/sessions', methods=['GET'])
 def list_sessions():
