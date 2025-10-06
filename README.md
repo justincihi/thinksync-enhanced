@@ -1,9 +1,10 @@
-# ThinkSync™ Enhanced Edition
+# WellTech AI MedSuite™
 
-**AI-Powered Therapy Session Analysis Platform**
+**Professional Clinical AI Solutions - Therapy Session Analysis Platform**  
+*Formerly ThinkSync™ Enhanced Edition*
 
 Developed by **Justin Cihi** for **Cadenza Therapeutics™** (formerly MedMind)  
-Part of the proprietary **AI MedSuite™** platform
+Part of the proprietary **WellTech AI MedSuite™** platform
 
 [![License](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
@@ -12,7 +13,7 @@ Part of the proprietary **AI MedSuite™** platform
 
 ## 🎯 Overview
 
-ThinkSync™ Enhanced Edition is a comprehensive AI-powered platform designed to assist mental health professionals in analyzing therapy sessions and generating professional clinical documentation. The system provides advanced sentiment analysis, SOAP/BIRP note generation, and complete session management capabilities.
+WellTech AI MedSuite™ is a comprehensive AI-powered platform designed to assist mental health professionals in analyzing therapy sessions and generating professional clinical documentation. The system provides advanced sentiment analysis, SOAP/BIRP note generation, complete user authentication, role-based access control, and session management capabilities.
 
 ### 🏥 Regulatory Compliance
 
