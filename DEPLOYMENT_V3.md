@@ -290,7 +290,7 @@ For issues, questions, or feature requests:
 ## 📄 License
 
 Proprietary - All Rights Reserved  
-© 2024 Cadenza Therapeutics™
+© 2024 All Rights Reserved
 
 ---
 

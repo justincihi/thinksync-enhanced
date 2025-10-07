@@ -3,8 +3,8 @@
 **Professional Clinical AI Solutions - Therapy Session Analysis Platform**  
 *Formerly ThinkSync™ Enhanced Edition*
 
-Developed by **Justin Cihi** for **Cadenza Therapeutics™** (formerly MedMind)  
-Part of the proprietary **WellTech AI MedSuite™** platform
+Developed by **Justin Cihi**  
+Part of the proprietary **AI MedSuite™** platform
 
 [![License](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)

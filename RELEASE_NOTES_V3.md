@@ -320,7 +320,6 @@ python3 app.py
 
 Special thanks to:
 - **Justin Cihi** - Lead Developer
-- **Cadenza Therapeutics™** - Project Sponsor
 - All beta testers and early adopters
 
 ---
@@ -339,7 +338,7 @@ Special thanks to:
 ## 📄 License
 
 Proprietary - All Rights Reserved  
-© 2024 Cadenza Therapeutics™
+© 2024 All Rights Reserved
 
 ---
 
