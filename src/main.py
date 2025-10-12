@@ -23,7 +23,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Initialize Flask app
-app = Flask(__name__, static_folder='../static', static_url_path='')
+app = Flask(__name__, static_folder='static', static_url_path='')
 CORS(app)
 
 # Configuration
@@ -340,15 +340,15 @@ Client shows significant progress in identifying anxiety triggers and implementi
 # Routes
 @app.route('/')
 def index():
-    return send_from_directory('../static', 'index.html')
+    return send_from_directory('static', 'index.html')
 
 @app.route('/mobile')
 def mobile_upload():
-    return send_from_directory('../static', 'mobile-upload.html')
+    return send_from_directory('static', 'mobile-upload.html')
 
 @app.route('/admin')
 def admin():
-    return send_from_directory('../static', 'admin.html')
+    return send_from_directory('static', 'admin.html')
 
 @app.route('/api/health')
 def health():
