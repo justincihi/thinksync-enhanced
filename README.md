@@ -22,6 +22,7 @@ This application is part of final vetting by the **NIH, FDA, HIPAA**, and releva
 ## ✨ Key Features
 
 ### 🔐 **User Management & Authentication**
+
 - **Multi-user Support**: Secure authentication system for multiple clinicians
 - **Role-based Access Control**: Admin and clinician roles with appropriate permissions
 - **Professional Registration**: License validation and admin approval workflow
