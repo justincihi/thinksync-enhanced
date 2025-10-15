@@ -17,6 +17,7 @@ from contextlib import contextmanager
 from functools import wraps
 from flask import Flask, request, jsonify, send_from_directory, render_template_string
 from flask_cors import CORS
+from file_management import add_file_management_routes, save_uploaded_file
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -720,6 +721,7 @@ def create_session():
             
             # Handle uploaded file
             uploaded_file = request.files.get('audio_file')
+            file_path = None
             if uploaded_file and uploaded_file.filename:
                 # Validate file type
                 allowed_extensions = {'.mp3', '.wav', '.m4a', '.mp4', '.webm', '.ogg'}
@@ -728,17 +730,13 @@ def create_session():
                 if file_ext not in allowed_extensions:
                     return jsonify({'error': f'Unsupported file type: {file_ext}. Supported: {", ".join(allowed_extensions)}'}), 400
                 
-                # Validate file size
-                file_info = {
-                    'original_name': uploaded_file.filename,
-                    'size': len(uploaded_file.read()),
-                    'type': uploaded_file.content_type
-                }
-                uploaded_file.seek(0)  # Reset file pointer
+                # Save file to disk
+                file_path, file_info = save_uploaded_file(uploaded_file, request.current_user['user_id'])
                 
-                logger.info(f"File upload received: {file_info['original_name']} ({file_info['size']} bytes)")
+                if file_path is None:
+                    return jsonify({'error': f'File save failed: {file_info}'}), 500
                 
-                transcript_note = f"Audio file '{file_info['original_name']}' ({file_info['size']} bytes) received and would be processed by Whisper API in production."
+                transcript_note = f"Audio file '{file_info['original_name']}' ({file_info['size']} bytes) saved to {file_path}"
             else:
                 transcript_note = "No audio file provided - using simulated session data."
         else:
@@ -762,11 +760,11 @@ def create_session():
             cursor = conn.cursor()
             cursor.execute('''
                 INSERT INTO therapy_sessions 
-                (session_id, user_id, client_name, therapy_type, summary_format, transcript, analysis, sentiment_analysis, validation_analysis, confidence_score, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (session_id, user_id, client_name, therapy_type, summary_format, transcript, analysis, sentiment_analysis, validation_analysis, confidence_score, status, file_path)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (session_id, request.current_user['user_id'], client_name, therapy_type, summary_format, transcript_note,
                   result['analysis'], json.dumps(result['sentimentAnalysis']), 
-                  result['validationAnalysis'], result['confidenceScore'], 'completed'))
+                  result['validationAnalysis'], result['confidenceScore'], 'completed', file_path))
             conn.commit()
         
         return jsonify({
@@ -812,6 +810,10 @@ def list_sessions():
     except Exception as e:
         logger.error(f"Session listing error: {e}")
         return jsonify({'error': 'Failed to retrieve sessions'}), 500
+
+
+# Register file management routes
+add_file_management_routes(app, get_db, require_auth)
 
 if __name__ == '__main__':
     print()

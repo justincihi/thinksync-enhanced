@@ -165,3 +165,8 @@ firebase-debug.*.log
 # Local development
 *.local
 
+
+# Uploaded files
+uploads/
+*.db
+*.db-journal
